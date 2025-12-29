@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package tasks;
+
+import "chat.proto";
+
+
+message ArchiveMessage {
+  chat.ChatMessage message = 1;
+}

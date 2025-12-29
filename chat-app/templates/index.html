@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Protobunny Chat</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-9">
+            <h2 id="chatHeader">Global Chat</h2>
+            <div id="messages" class="border bg-white p-3 mb-3" style="height: 400px; overflow-y: scroll;"></div>
+            <div class="input-group">
+                <input type="text" id="messageText" class="form-control" placeholder="Type..." >
+                <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="col-3">
+            <h5>Online Users</h5>
+            <div id="userList" class="list-group">
+                <button class="list-group-item list-group-item-action active" onclick="startPrivateChat('global')">
+                    🌎 Global Chat
+                </button>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Check if we have a saved ID, otherwise create one
+    let current_user = localStorage.getItem('chat_username');
+
+    if (!current_user) {
+        current_user = "user_" + Math.floor(Math.random() * 10000);
+        localStorage.setItem('chat_username', current_user);
+    }
+    {#const current_user = "User_" + Math.floor(Math.random() * 1000);#}
+    document.getElementById('chatHeader').textContent = `Hallo there ${current_user}!`;
+    let activePrivateChat = null; // null means Global
+
+    const ws = new WebSocket(`ws://localhost:8000/ws/${current_user}`);
+    const node = document.getElementById("messageText");
+    node.addEventListener("keyup", ({key}) => {
+        if (key === "Enter") {
+            sendMessage();
+        }
+    });
+    // --- Global State ---
+    const messageCache = {
+        "global": [], // Store global messages here
+        // "User_123": [ {sender, content}, ... ]
+    };
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        // Handle Presence Update
+        if (data.client_id) {
+            updateUserList(data);
+            return;
+        }
+
+        // Handle Chat Message
+        displayMessage(data);
+    };
+
+    function updateUserList(data) {
+        console.log("Presence Update");
+
+        const list = document.getElementById('userList');
+        let el = document.getElementById(`user-${data.client_id}`);
+        console.log(el);
+        console.log(current_user);
+
+        if (data.online && !el) {
+            // create user element in the right panel
+            console.log(data.client_id);
+            el = document.createElement('button');
+            el.id = `user-${data.client_id}`;
+            el.className = "list-group-item list-group-item-action";
+            el.innerText = data.client_id;
+            el.ondblclick = () => startPrivateChat(data.client_id);
+            list.appendChild(el);
+        } else if (!data.online && el) {
+            el.remove();
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById("messageText");
+        const msg = {
+            content: input.value,
+            to_user: activePrivateChat || "", // If null, it's global chat
+            sender: current_user,
+        };
+        ws.send(JSON.stringify(msg));
+        input.value = '';
+    }
+
+    function displayMessage(data) {
+        const sender = data.sender;
+        const toUser = data.to_user || "";
+        const content = data.content;
+
+        const chatPartner = (toUser === "") ? "global" : (sender === current_user ? toUser : sender);
+        const isGlobalMsg = (toUser === "");
+        if (!messageCache[chatPartner]) {
+            messageCache[chatPartner] = [];
+        }
+        messageCache[chatPartner].push({sender, content});
+        if (isGlobalMsg && activePrivateChat === null) {
+            // We are in Global view, show global message
+            renderSingleMessage(sender, content);
+        }
+        else if (!isGlobalMsg) {
+            if (chatPartner === activePrivateChat) {
+                // We are in the correct Private view, show it
+                renderSingleMessage(sender, content);
+            } else if (sender !== current_user) {
+                // It's a private message for a window that isn't open
+                notifyNewPrivateMessage(sender);
+            }
+        }
+    }
+
+    function startPrivateChat(userId) {
+        activePrivateChat = userId;
+
+        // Clear notification UI
+        const userBtn = document.getElementById(`user-${userId}`);
+        if (userBtn) {
+            userBtn.classList.remove("bg-warning");
+            userBtn.innerText = userId;
+        }
+
+        document.getElementById('chatHeader').innerText = (userId === "global") ? `${current_user} Global Chat` : `Private Chat with ${userId}`;
+
+        // RE-RENDER everything from the cache for this specific user
+        renderEntireCache(userId);
+    }
+
+    function renderEntireCache(chatId) {
+        const container = document.getElementById('messages');
+        container.innerHTML = ''; // Clear current screen
+
+        const messages = messageCache[chatId] || [];
+        messages.forEach(msg => {
+            renderSingleMessage(msg.sender, msg.content);
+        });
+    }
+
+    function renderSingleMessage(sender, content) {
+        const container = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.innerHTML = `<b>${sender}:</b> ${content}`;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function notifyNewPrivateMessage(sender, content) {
+        const userBtn = document.getElementById(`user-${sender}`);
+        if (userBtn) {
+            userBtn.classList.add("bg-warning"); // Highlight the user in the list
+            userBtn.innerHTML = `${sender} (New Message!)`;
+        }
+
+    }
+
+</script>
+</body>
+</html>
