@@ -57,7 +57,7 @@ requires-python = ">=3.10,<3.14"
 dependencies = [
     "fastapi>=0.126.0",
     "uvicorn[standard]>=0.38.0",
-    "protobunny[redis] @/home/domenico/work/projects/protobunny",
+    "protobunny[redis] >=0.1.2a1",
     "aiosqlite>=0.22.1",
 ]
 [tool.protobunny]
