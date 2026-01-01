@@ -150,7 +150,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             await pb.publish(cl.tasks.ArchiveMessage(message=chat_msg))
 
     except WebSocketDisconnect:
-        manager.disconnect(websocket, client_id)
+        manager.disconnect(client_id, websocket)
         disconnect_status = cl.chat.UserStatus(client_id=client_id, online=False)
         await pb.publish(disconnect_status)
         await save_to_presence_statuses(disconnect_status)
