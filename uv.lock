@@ -248,7 +248,7 @@ dev = [
 requires-dist = [
     { name = "aiosqlite", specifier = ">=0.22.1" },
     { name = "fastapi", specifier = ">=0.126.0" },
-    { name = "protobunny", extras = ["redis"], specifier = ">=0.1.2a2" },
+    { name = "protobunny", extras = ["redis"], specifier = ">=0.1.2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.38.0" },
 ]
 
@@ -696,7 +696,7 @@ wheels = [
 
 [[package]]
 name = "protobunny"
-version = "0.1.2a2"
+version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "betterproto", extra = ["compiler"] },
@@ -706,9 +706,9 @@ dependencies = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/58/be3186213b8b6ffa6186dd6924e7d08cf4b48309f8bddb26cfa5dafb3141/protobunny-0.1.2a2.tar.gz", hash = "sha256:bfffe388997bb7c39cce1f25297ee1f45fa7c4f959ab69626c52caaa116e2238", size = 83055, upload-time = "2026-01-01T13:18:11.29Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3a/00/943a8f93817e2114e0349194ac6169c7fdb2ce0da5ff037967b438469a72/protobunny-0.1.2.tar.gz", hash = "sha256:f9f1fb9d687f6cac09ed18592fa3483855f0877511b96f77169016b2dd00fb45", size = 84562, upload-time = "2026-01-01T14:29:59.934Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/c9/704dbf35827e8ff35dde2df5bbbc4eca92c7a9174b0fffc1ebdb38b4549c/protobunny-0.1.2a2-py3-none-any.whl", hash = "sha256:c7b8730ca5d33357c1447ed160a2d97473bc563c56892893f2a3be2c47805f7f", size = 111079, upload-time = "2026-01-01T13:18:09.709Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/5b/35608035c928e26cd8b85d2759ca946d9b98c1d1175e4b15fca3d5f8f11c/protobunny-0.1.2-py3-none-any.whl", hash = "sha256:ba9a9c1aa84f430b4aca70b4b22f987fe005ed63ff579396ce199cd2eb19fa94", size = 115161, upload-time = "2026-01-01T14:29:58.45Z" },
 ]
 
 [package.optional-dependencies]
