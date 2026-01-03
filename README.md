@@ -14,7 +14,6 @@ Our application consists of three main parts:
 chat-app/
 └── messages/            # Protobuf definitions
 ├── chatlib/             # Generated betterproto code
-├── static/              # CSS/JS for the frontend
 ├── templates/           # HTML templates
 ├── main.py              # FastAPI server (Pub/Sub logic)
 └── worker.py            # Archive service (Consumer logic)
@@ -32,7 +31,7 @@ For the chat app, we will use the redis backend.
 
 If you want to use a different broker:
 
-- replace the redis specific app code dependency with the one for your broker available (rabbitmq, mosquitto, redis)  
+- replace the redis specific app code dependency with the one for your broker available (rabbitmq, mosquitto, redis, nats)  
 - change the `backend` in the `[tool.protobunny]` section in pyproject.toml file.
 
 You can also use `backend=python` to use a local in-process broker for testing purposes. 
@@ -57,7 +56,7 @@ requires-python = ">=3.10,<3.14"
 dependencies = [
     "fastapi>=0.126.0",
     "uvicorn[standard]>=0.38.0",
-    "protobunny[redis] >=0.1.2a1",
+    "protobunny[redis] >=0.1.2",
     "aiosqlite>=0.22.1",
 ]
 [tool.protobunny]
